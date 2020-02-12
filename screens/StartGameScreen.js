@@ -14,6 +14,7 @@ import Card from "../components/Card";
 import Input from "../components/Input";
 
 import Colors from "../constants/colors";
+import DefaultStyles from "../constants/default-styles";
 import NumberContainer from "../components/NumberContainer";
 
 export default function StartGameScreen(props) {
@@ -28,7 +29,14 @@ export default function StartGameScreen(props) {
   const confirmInputHandler = () => {
     const chosenNumber = parseInt(enteredValue);
 
-    if (isNaN(chosenNumber) || chosenNumber <= 0 || chosenNumber > 99) {
+    if (isNaN(chosenNumber)) {
+      Alert.alert("Invalid Value!", "Please input a number.", [
+        { text: "OK", style: "default", onPress: resetInputHandler }
+      ]);
+      return;
+    }
+
+    if (chosenNumber <= 0 || chosenNumber > 99) {
       Alert.alert(
         "Invalid Value!",
         "The number has to be a value between 1 and 99.",
@@ -53,7 +61,7 @@ export default function StartGameScreen(props) {
   if (confirmed) {
     confirmedOutput = (
       <Card style={styles.summaryContainer}>
-        <Text style={styles.selectedTitle}>You Selected</Text>
+        <Text style={DefaultStyles.title}>You Selected</Text>
         <NumberContainer>{selectedNumber}</NumberContainer>
         <Button
           title="START GAME"
@@ -70,9 +78,9 @@ export default function StartGameScreen(props) {
       }}
     >
       <View style={styles.screen}>
-        <Text style={styles.title}>Start a New Game!</Text>
+        <Text style={DefaultStyles.title}>Start a New Game!</Text>
         <Card style={styles.inputContainer}>
-          <Text>Select a Number</Text>
+          <Text style={DefaultStyles.bodyText}>Select a Number</Text>
 
           <Input
             style={styles.input}
@@ -114,11 +122,6 @@ const styles = StyleSheet.create({
     padding: 10,
     alignItems: "center" // Cross-axis
   },
-  title: {
-    fontSize: 20,
-    marginVertical: 10,
-    fontWeight: "bold"
-  },
   inputContainer: {
     width: 300,
     maxWidth: "80%",
@@ -141,9 +144,5 @@ const styles = StyleSheet.create({
   summaryContainer: {
     marginTop: 25,
     alignItems: "center"
-  },
-  selectedTitle: {
-    fontSize: 20,
-    fontWeight: "bold"
   }
 });
