@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, Text, StyleSheet, Alert } from "react-native";
+import { View, Text, StyleSheet, Alert, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import NumberContainer from "../components/NumberContainer";
 import Card from "../components/Card";
 
 import DefaultStyles from "../constants/default-styles";
+import Colors from "../constants/colors";
 import CustomButton from "../components/CustomButton";
 
 const generateRandomBetween = (min, max, exclude) => {
@@ -21,12 +22,18 @@ const generateRandomBetween = (min, max, exclude) => {
   }
 };
 
-export default function GameScreen(props) {
-  const [currentGuess, setCurrentGuess] = useState(
-    generateRandomBetween(1, 100, props.userChoice)
-  );
+const renderListItem = (value, numOfRound) => (
+  <View key={value} style={styles.listItem}>
+    <Text style={DefaultStyles.bodyText}>#{numOfRound}</Text>
+    <Text style={DefaultStyles.bodyText}>{value}</Text>
+  </View>
+);
 
-  const [rounds, setRounds] = useState(0);
+export default function GameScreen(props) {
+  const initialGuess = generateRandomBetween(1, 100, props.userChoice);
+
+  const [currentGuess, setCurrentGuess] = useState(initialGuess);
+  const [pastGuesses, setPastGuesses] = useState([initialGuess]);
 
   const currentLow = useRef(1);
   const currentHigh = useRef(100);
@@ -35,7 +42,7 @@ export default function GameScreen(props) {
 
   useEffect(() => {
     if (currentGuess === userChoice) {
-      onGameOver(rounds);
+      onGameOver(pastGuesses.length);
     }
   }, [currentGuess, userChoice, onGameOver]);
 
@@ -54,7 +61,7 @@ export default function GameScreen(props) {
     if (direction === "lower") {
       currentHigh.current = currentGuess;
     } else {
-      currentLow.current = currentGuess;
+      currentLow.current = currentGuess + 1;
     }
 
     const nextGuess = generateRandomBetween(
@@ -64,7 +71,8 @@ export default function GameScreen(props) {
     );
 
     setCurrentGuess(nextGuess);
-    setRounds(currRounds => currRounds + 1);
+    // setRounds(currRounds => currRounds + 1);
+    setPastGuesses(currentState => [nextGuess, ...currentState]);
   };
 
   return (
@@ -80,6 +88,14 @@ export default function GameScreen(props) {
           <Ionicons name="md-add" size={24} color="white" />
         </CustomButton>
       </Card>
+
+      <View style={styles.listContainer}>
+        <ScrollView contentContainerStyle={styles.list}>
+          {pastGuesses.map((guess, index) =>
+            renderListItem(guess, pastGuesses.length - index)
+          )}
+        </ScrollView>
+      </View>
     </View>
   );
 }
@@ -96,5 +112,25 @@ const styles = StyleSheet.create({
     marginTop: 20,
     width: 400,
     maxWidth: "80%"
+  },
+  listContainer: {
+    width: "80%",
+    marginVertical: 15,
+    flex: 1 // Without this property the list won't scroll in Android.
+  },
+  list: {
+    flexGrow: 1, // Same as flex but more "flexible". Better for ScrollViews than normal flex.
+    alignItems: "center",
+    justifyContent: "flex-end"
+  },
+  listItem: {
+    borderColor: Colors.secondary,
+    borderWidth: 2,
+    padding: 15,
+    marginVertical: 10,
+    backgroundColor: "white",
+    flexDirection: "row",
+    justifyContent: "space-around",
+    width: "65%"
   }
 });
