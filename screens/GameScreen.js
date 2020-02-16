@@ -5,7 +5,8 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
-  FlatList
+  FlatList,
+  Dimensions
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -82,6 +83,11 @@ export default function GameScreen(props) {
     setPastGuesses(currentState => [nextGuess.toString(), ...currentState]);
   };
 
+  let listContainerStyle = styles.listContainer;
+
+  if (Dimensions.get("window").width < 350)
+    listContainerStyle = styles.listContainerSmall;
+
   return (
     <View style={styles.screen}>
       <Text style={DefaultStyles.title}>Opponet's Guess: </Text>
@@ -96,7 +102,7 @@ export default function GameScreen(props) {
         </CustomButton>
       </Card>
 
-      <View style={styles.listContainer}>
+      <View style={listContainerStyle}>
         {/* <ScrollView contentContainerStyle={styles.list}>
           {pastGuesses.map((guess, index) =>
             renderListItem(guess, pastGuesses.length - index)
@@ -124,12 +130,17 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginTop: 20,
+    marginTop: Dimensions.get("window").height > 600 ? 20 : 10,
     width: 400,
     maxWidth: "80%"
   },
   listContainer: {
     width: "60%",
+    marginVertical: 15,
+    flex: 1 // Without this property the list won't scroll in Android.
+  },
+  listContainerSmall: {
+    width: "80%",
     marginVertical: 15,
     flex: 1 // Without this property the list won't scroll in Android.
   },
